@@ -1,22 +1,28 @@
 public class Employee {
-    private int empolyeeID;
-    private String name;
+    private final int employeeID;
+    private final String employeeName;
+    private final String employeeRole;
 
-    // Default constructor requiring name and phone number
-    public Employee(String name) {
-        this.name = name;
+    public Employee(int employeeID, String employeeName, String employeeRole) {
+        this.employeeID = employeeID;
+        this.employeeName = employeeName;
+        this.employeeRole = employeeRole;
     }
 
-    // Getter and Setter Methods
-    public int getID() {
-        return empolyeeID;
+    public int getEmployeeID() {
+        return employeeID;
     }
 
-    public String getName() {
-        return name;
+    public String getEmployeeName() {
+        return employeeName;
     }
 
-    public void setName(String newName) {
-        name = newName;
+    public String getEmployeeRole() {
+        return employeeRole;
+    }
+
+    @Override
+    public String toString() {
+        return employeeName + " (" + employeeRole + ")";
     }
 }

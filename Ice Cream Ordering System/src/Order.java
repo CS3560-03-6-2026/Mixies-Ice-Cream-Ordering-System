@@ -1,22 +1,35 @@
-public class Order {
-    private int orderID;
-    private double subtotal;
-    private double tip;
-    private double total;
+import java.util.ArrayList;
+import java.util.List;
 
-    // Default constructor with subtotal and tip
-    public Order(double subtotal, double tip) {
-        this.subtotal = subtotal;
+public class Order {
+    private final int orderID;
+    private final int employeeID;
+    private final String orderDate;
+    private final double tip;
+    private final double total;
+    private final String orderStatus;
+    private final List<OrderItem> items;
+
+    public Order(int orderID, int employeeID, String orderDate, double tip, double total, String orderStatus) {
+        this.orderID = orderID;
+        this.employeeID = employeeID;
+        this.orderDate = orderDate;
         this.tip = tip;
+        this.total = total;
+        this.orderStatus = orderStatus;
+        this.items = new ArrayList<>();
     }
 
-    // Getter and Setter Methods
-    public int getID() {
+    public int getOrderID() {
         return orderID;
     }
 
-    public double getSubtotal() {
-        return subtotal;
+    public int getEmployeeID() {
+        return employeeID;
+    }
+
+    public String getOrderDate() {
+        return orderDate;
     }
 
     public double getTip() {
@@ -25,5 +38,17 @@ public class Order {
 
     public double getTotal() {
         return total;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void addItem(OrderItem item) {
+        items.add(item);
     }
 }
