@@ -1,43 +1,55 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class OrderItem {
-    /** Enum for cone type */
-    private enum ConeTypes {
-        WAFFLE_CONE,
-        CUP
-    }
+    private final int orderItemID;
+    private final int orderID;
+    private final IceCreamFlavor flavor;
+    private final int quantity;
+    private final double itemCost;
+    private final String refundStatus;
+    private final List<OrderItemTopping> toppings;
 
-    private ConeTypes coneType;
-    private int quantity;
-    private String edits;
-
-    // Default constructor requiring cone type, quantity, and edits
-    public OrderItem(ConeTypes coneType, int quantity, String edits) {
-        this.coneType = coneType;
+    public OrderItem(int orderItemID, int orderID, IceCreamFlavor flavor,
+                     int quantity, double itemCost, String refundStatus) {
+        this.orderItemID = orderItemID;
+        this.orderID = orderID;
+        this.flavor = flavor;
         this.quantity = quantity;
-        this.edits = edits;
+        this.itemCost = itemCost;
+        this.refundStatus = refundStatus;
+        this.toppings = new ArrayList<>();
     }
 
-    // Getter and Setter Methods
-    public ConeTypes getName() {
-        return coneType;
+    public int getOrderItemID() {
+        return orderItemID;
+    }
+
+    public int getOrderID() {
+        return orderID;
+    }
+
+    public IceCreamFlavor getFlavor() {
+        return flavor;
     }
 
     public int getQuantity() {
         return quantity;
     }
 
-    public String getEdits() {
-        return edits;
+    public double getItemCost() {
+        return itemCost;
     }
 
-    public void setName(ConeTypes newConeType) {
-        coneType = newConeType;
+    public String getRefundStatus() {
+        return refundStatus;
     }
 
-    public void setQuantity(int newQuantity) {
-        quantity = newQuantity;
+    public List<OrderItemTopping> getToppings() {
+        return toppings;
     }
 
-    public void setEdits(String newEdits) {
-        edits = newEdits;
+    public void addTopping(OrderItemTopping topping) {
+        toppings.add(topping);
     }
 }

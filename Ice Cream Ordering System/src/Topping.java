@@ -1,36 +1,22 @@
-public class Topping extends MenuItem {
-    /** Enum for type of topping */
-    private enum ToppingTypes {
-        SAUCE,
-        CRUMBLE,
-        FRUIT,
-        CANDY
+public class Topping {
+    private final int toppingID;
+    private final String toppingName;
+
+    public Topping(int toppingID, String toppingName) {
+        this.toppingID = toppingID;
+        this.toppingName = toppingName;
     }
 
-    private ToppingTypes toppingType;
-
-    // Default Constructor for type
-    public Topping(String name, double price, int stockQuantity, String[] allergens, ToppingTypes type) {
-        super(name, price, stockQuantity, allergens);
-        toppingType = type;
+    public int getToppingID() {
+        return toppingID;
     }
 
-    // Getter and Setter Methods
-    /**
-     * Method to set the topping type
-     * 
-     * @param newTopping The new topping type to be set
-     */
-    public void setTopping(ToppingTypes newType) {
-        toppingType = newType;
+    public String getToppingName() {
+        return toppingName;
     }
 
-    /**
-     * Method to get the current topping type
-     * 
-     * @return the current topping type
-     */
-    public ToppingTypes getTopping() {
-        return toppingType;
+    @Override
+    public String toString() {
+        return toppingName;
     }
 }
