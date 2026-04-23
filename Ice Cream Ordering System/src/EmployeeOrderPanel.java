@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeOrderPanel extends JPanel {
@@ -8,17 +9,16 @@ public class EmployeeOrderPanel extends JPanel {
     private final Employee loggedInEmployee;
 
     private final JComboBox<IceCreamFlavor> flavorBox = new JComboBox<>();
-    private final JComboBox<Topping> toppingBox = new JComboBox<>();
     private final JTextField quantityField = new JTextField("1", 5);
-    private final JTextField itemCostField = new JTextField("3.50", 5);
-    private final JTextField toppingQtyField = new JTextField("1", 5);
+    private final JButton selectToppingsBtn = new JButton("Select Toppings");
+    private final JLabel selectedToppingsLabel = new JLabel("No toppings selected");
+    private List<Topping> selectedToppings = new ArrayList<>();
 
     private final JLabel orderStatusLabel = new JLabel("Order Status: None");
     private final JLabel orderTotalLabel = new JLabel("Order Total: 0.00");
 
     private final DefaultTableModel orderItemTableModel = new DefaultTableModel(
-            new Object[]{"OrderItem ID", "Flavor", "Quantity", "Cost", "Refund Status"}, 0
-    ) {
+            new Object[] { "OrderItem ID", "Flavor", "Quantity", "Cost", "Refund Status" }, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
@@ -45,17 +45,15 @@ public class EmployeeOrderPanel extends JPanel {
         topPanel.add(orderStatusLabel);
         topPanel.add(orderTotalLabel);
 
-        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel formPanel = new JPanel(new GridLayout(4, 2, 10, 10));
         formPanel.add(new JLabel("Flavor:"));
         formPanel.add(flavorBox);
         formPanel.add(new JLabel("Quantity:"));
         formPanel.add(quantityField);
-        formPanel.add(new JLabel("Item Cost:"));
-        formPanel.add(itemCostField);
-        formPanel.add(new JLabel("Topping:"));
-        formPanel.add(toppingBox);
-        formPanel.add(new JLabel("Topping Quantity:"));
-        formPanel.add(toppingQtyField);
+        formPanel.add(new JLabel("Toppings:"));
+        formPanel.add(selectToppingsBtn);
+        formPanel.add(new JLabel("Selected:"));
+        formPanel.add(selectedToppingsLabel);
 
         JPanel buttonPanel = new JPanel();
         JButton addItemBtn = new JButton("Add Order Item");
@@ -77,21 +75,17 @@ public class EmployeeOrderPanel extends JPanel {
         addItemBtn.addActionListener(e -> addOrderItem());
         addToppingBtn.addActionListener(e -> addToppingToSelectedItem());
         refundBtn.addActionListener(e -> refundSelectedItem());
+        selectToppingsBtn.addActionListener(e -> openToppingSelector());
 
         refreshData();
     }
 
     private void refreshData() {
         flavorBox.removeAllItems();
-        toppingBox.removeAllItems();
 
         List<IceCreamFlavor> flavors = service.getAllFlavors();
         for (IceCreamFlavor flavor : flavors) {
             flavorBox.addItem(flavor);
-        }
-
-        for (Topping topping : service.getAllToppings()) {
-            toppingBox.addItem(topping);
         }
 
         refreshOrderItemsTable();
@@ -115,15 +109,17 @@ public class EmployeeOrderPanel extends JPanel {
     private void refreshOrderItemsTable() {
         orderItemTableModel.setRowCount(0);
 
-        if (currentOrderID == -1) return;
+        if (currentOrderID == -1) {
+            return;
+        }
 
         List<OrderItem> items = service.getOrderItemsForOrder(currentOrderID);
         for (OrderItem item : items) {
-            orderItemTableModel.addRow(new Object[]{
+            orderItemTableModel.addRow(new Object[] {
                     item.getOrderItemID(),
                     item.getFlavor().getFlavorName(),
                     item.getQuantity(),
-                    item.getItemCost(),
+                    service.getDisplayedOrderItemCost(item),
                     item.getRefundStatus()
             });
         }
@@ -143,6 +139,12 @@ public class EmployeeOrderPanel extends JPanel {
     private void concludeOrder() {
         if (currentOrderID == -1) {
             JOptionPane.showMessageDialog(this, "Create an order first.");
+            return;
+        }
+
+        List<OrderItem> items = service.getOrderItemsForOrder(currentOrderID);
+        if (items.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Cannot conclude an order with no items.");
             return;
         }
 
@@ -171,14 +173,13 @@ public class EmployeeOrderPanel extends JPanel {
 
         try {
             int quantity = Integer.parseInt(quantityField.getText().trim());
-            double itemCost = Double.parseDouble(itemCostField.getText().trim());
 
             if (flavor.isOutOfStock()) {
                 JOptionPane.showMessageDialog(this, "This flavor is out of stock and cannot be added.");
                 return;
             }
 
-            int orderItemID = service.addOrderItem(currentOrderID, flavor.getFlavorID(), quantity, itemCost);
+            int orderItemID = service.addOrderItem(currentOrderID, flavor.getFlavorID(), quantity);
 
             if (orderItemID == -1) {
                 JOptionPane.showMessageDialog(this, "Could not add item. Not enough stock or unavailable.");
@@ -192,8 +193,7 @@ public class EmployeeOrderPanel extends JPanel {
                         this,
                         updatedFlavor.getFlavorName() + " has reached the remake threshold.",
                         "Low Stock Warning",
-                        JOptionPane.WARNING_MESSAGE
-                );
+                        JOptionPane.WARNING_MESSAGE);
             }
 
             if (updatedFlavor != null && updatedFlavor.isOutOfStock()) {
@@ -201,14 +201,46 @@ public class EmployeeOrderPanel extends JPanel {
                         this,
                         updatedFlavor.getFlavorName() + " is now out of stock.",
                         "Out Of Stock",
-                        JOptionPane.WARNING_MESSAGE
-                );
+                        JOptionPane.WARNING_MESSAGE);
             }
 
             refreshData();
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Quantity and cost must be valid numbers.");
+            JOptionPane.showMessageDialog(this, "Quantity must be a valid number.");
+        }
+    }
+
+    private void openToppingSelector() {
+        List<Topping> allToppings = service.getAllToppings();
+
+        DefaultListModel<Topping> model = new DefaultListModel<>();
+        for (Topping topping : allToppings) {
+            model.addElement(topping);
+        }
+
+        JList<Topping> toppingJList = new JList<>(model);
+        toppingJList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                new JScrollPane(toppingJList),
+                "Select Toppings",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            selectedToppings = toppingJList.getSelectedValuesList();
+
+            if (selectedToppings.isEmpty()) {
+                selectedToppingsLabel.setText("No toppings selected");
+            } else {
+                String names = selectedToppings.stream()
+                        .map(Topping::getToppingName)
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("No toppings selected");
+                selectedToppingsLabel.setText(names);
+            }
         }
     }
 
@@ -230,22 +262,27 @@ public class EmployeeOrderPanel extends JPanel {
             return;
         }
 
-        Topping topping = (Topping) toppingBox.getSelectedItem();
-        if (topping == null) {
-            JOptionPane.showMessageDialog(this, "Select a topping.");
+        if (selectedToppings.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Select at least one topping first.");
             return;
         }
 
-        try {
-            int toppingQty = Integer.parseInt(toppingQtyField.getText().trim());
-            int orderItemID = (int) orderItemTableModel.getValueAt(selectedRow, 0);
+        int orderItemID = (int) orderItemTableModel.getValueAt(selectedRow, 0);
 
-            boolean ok = service.addOrderItemTopping(orderItemID, topping.getToppingID(), toppingQty);
-            JOptionPane.showMessageDialog(this, ok ? "Topping added." : "Failed to add topping.");
-
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Topping quantity must be a number.");
+        boolean allAdded = true;
+        for (Topping topping : selectedToppings) {
+            boolean ok = service.addOrderItemTopping(orderItemID, topping.getToppingID(), 1);
+            if (!ok) {
+                allAdded = false;
+            }
         }
+
+        JOptionPane.showMessageDialog(this,
+                allAdded ? "Toppings added." : "Some toppings could not be added.");
+
+        selectedToppings.clear();
+        selectedToppingsLabel.setText("No toppings selected");
+        refreshData();
     }
 
     private void refundSelectedItem() {

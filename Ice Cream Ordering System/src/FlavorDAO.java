@@ -9,8 +9,8 @@ public class FlavorDAO {
         String sql = "SELECT * FROM IceCreamFlavor ORDER BY flavorName";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 flavors.add(new IceCreamFlavor(
@@ -20,8 +20,7 @@ public class FlavorDAO {
                         rs.getInt("stockLevel"),
                         rs.getInt("remakeThreshold"),
                         rs.getString("allergens"),
-                        rs.getString("availabilityStatus")
-                ));
+                        rs.getString("availabilityStatus")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -34,7 +33,7 @@ public class FlavorDAO {
         String sql = "SELECT * FROM IceCreamFlavor WHERE flavorID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, flavorID);
 
@@ -47,8 +46,7 @@ public class FlavorDAO {
                             rs.getInt("stockLevel"),
                             rs.getInt("remakeThreshold"),
                             rs.getString("allergens"),
-                            rs.getString("availabilityStatus")
-                    );
+                            rs.getString("availabilityStatus"));
                 }
             }
         } catch (SQLException e) {
@@ -59,7 +57,7 @@ public class FlavorDAO {
     }
 
     public boolean createFlavor(String flavorName, String seasonality, int stockLevel,
-                                int remakeThreshold, String allergens, String availabilityStatus) {
+            int remakeThreshold, String allergens, String availabilityStatus) {
         String sql = """
                 INSERT INTO IceCreamFlavor
                 (flavorName, seasonality, stockLevel, remakeThreshold, allergens, availabilityStatus)
@@ -67,7 +65,7 @@ public class FlavorDAO {
                 """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, flavorName);
             stmt.setString(2, seasonality);
@@ -87,7 +85,7 @@ public class FlavorDAO {
         String sql = "UPDATE IceCreamFlavor SET availabilityStatus = ? WHERE flavorID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newAvailability);
             stmt.setInt(2, flavorID);
@@ -102,7 +100,7 @@ public class FlavorDAO {
         String sql = "UPDATE IceCreamFlavor SET seasonality = ? WHERE flavorID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newSeasonality);
             stmt.setInt(2, flavorID);
@@ -117,7 +115,7 @@ public class FlavorDAO {
         String sql = "DELETE FROM IceCreamFlavor WHERE flavorID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, flavorID);
             return stmt.executeUpdate() > 0;
@@ -134,12 +132,28 @@ public class FlavorDAO {
                 """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, amount);
             stmt.setInt(2, flavorID);
             stmt.setInt(3, amount);
             return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateFlavorStock(int flavorID, int newStock) {
+        String sql = "UPDATE IceCreamFlavor SET stockLevel = ? WHERE flavorID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, newStock);
+            stmt.setInt(2, flavorID);
+            return stmt.executeUpdate() > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
