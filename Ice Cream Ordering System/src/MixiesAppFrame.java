@@ -73,11 +73,4 @@ public class MixiesAppFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Invalid employee ID.");
         }
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            Employee loggedIn = new Employee(1, "Ava", "Employee");
-            new MixiesAppFrame(loggedIn).setVisible(true);
-        });
-    }
 }
