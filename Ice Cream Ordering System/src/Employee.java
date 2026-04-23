@@ -1,9 +1,9 @@
 public class Employee {
     private final int employeeID;
     private final String employeeName;
-    private final String employeeRole;
+    private final employeeRoles employeeRole;
 
-    public Employee(int employeeID, String employeeName, String employeeRole) {
+    public Employee(int employeeID, String employeeName, employeeRoles employeeRole) {
         this.employeeID = employeeID;
         this.employeeName = employeeName;
         this.employeeRole = employeeRole;
@@ -17,7 +17,7 @@ public class Employee {
         return employeeName;
     }
 
-    public String getEmployeeRole() {
+    public employeeRoles getEmployeeRole() {
         return employeeRole;
     }
 

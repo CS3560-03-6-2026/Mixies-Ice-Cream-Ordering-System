@@ -41,10 +41,8 @@ public class MixiesAppFrame extends JFrame {
         add(tabs, BorderLayout.CENTER);
     }
 
-    private void openManagerAccess() {
-        String input = JOptionPane.showInputDialog(this, "Enter employee ID:");
-        if (input == null || input.isBlank()) {
-            return;
+        if (loggedInEmployee.getEmployeeRole() == employeeRoles.MANAGER) {
+            tabs.addTab("Manager", new ManagerPanel(service, loggedInEmployee));
         }
 
         try {
@@ -75,11 +73,17 @@ public class MixiesAppFrame extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            // Change this to match a real employee in your database
-            Employee loggedIn = new Employee(1, "Ava", "Employee");
-            new MixiesAppFrame(loggedIn).setVisible(true);
-        });
+    public MixiesAppFrame() {
+        MixiesService service = new MixiesService();
+
+        setTitle("Mixies Ice Cream System");
+        setSize(1000, 650);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("Ice Cream Flavors", new IceCreamFlavorPanel(service, new OrderItem(0, 0, null, 0, 0.0, "None")));
+        add(tabs);
     }
+
 }

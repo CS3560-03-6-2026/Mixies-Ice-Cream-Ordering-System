@@ -52,4 +52,7 @@ public class OrderItem {
     public void addTopping(OrderItemTopping topping) {
         toppings.add(topping);
     }
+
+    public void addItem(IceCreamFlavor flavor) {
+    }
 }

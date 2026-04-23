@@ -162,6 +162,6 @@ public class MixiesService {
     }
 
     private boolean isManager(Employee employee) {
-        return employee != null && "Manager".equalsIgnoreCase(employee.getEmployeeRole());
+        return employee != null && (employee.getEmployeeRole() == employeeRoles.MANAGER);
     }
 }
