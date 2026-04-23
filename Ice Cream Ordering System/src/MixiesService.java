@@ -2,9 +2,20 @@ import java.util.List;
 
 public class MixiesService {
     public static final double TOPPING_PRICE = 0.50;
+    public static final double SCOOP_PRICE = 3.50;
     private final FlavorDAO flavorDAO = new FlavorDAO();
     private final ToppingDAO toppingDAO = new ToppingDAO();
     private final OrderDAO orderDAO = new OrderDAO();
+    private final EmployeeDAO employeeDAO = new EmployeeDAO();
+
+    public Employee getEmployeeById(int employeeID) {
+        return employeeDAO.getEmployeeById(employeeID);
+    }
+
+    public boolean canAccessManagerScreen(int employeeID) {
+        Employee employee = employeeDAO.getEmployeeById(employeeID);
+        return employee != null && "Manager".equalsIgnoreCase(employee.getEmployeeRole());
+    }
 
     public List<IceCreamFlavor> getAllFlavors() {
         return flavorDAO.getAllFlavors();
@@ -23,34 +34,48 @@ public class MixiesService {
     }
 
     public boolean createFlavor(Employee employee, String flavorName, String seasonality,
-                                int stockLevel, int remakeThreshold,
-                                String allergens, String availabilityStatus) {
-        if (!isManager(employee)) return false;
-        return flavorDAO.createFlavor(flavorName, seasonality, stockLevel, remakeThreshold, allergens, availabilityStatus);
+            int stockLevel, int remakeThreshold,
+            String allergens, String availabilityStatus) {
+        if (!isManager(employee))
+            return false;
+        return flavorDAO.createFlavor(flavorName, seasonality, stockLevel, remakeThreshold, allergens,
+                availabilityStatus);
     }
 
     public boolean updateFlavorAvailability(Employee employee, int flavorID, String newAvailability) {
-        if (!isManager(employee)) return false;
+        if (!isManager(employee))
+            return false;
         return flavorDAO.updateFlavorAvailability(flavorID, newAvailability);
     }
 
     public boolean updateFlavorSeasonality(Employee employee, int flavorID, String newSeasonality) {
-        if (!isManager(employee)) return false;
+        if (!isManager(employee))
+            return false;
         return flavorDAO.updateFlavorSeasonality(flavorID, newSeasonality);
     }
 
+    public boolean updateFlavorStock(Employee employee, int flavorID, int newStock) {
+        if (!isManager(employee)) {
+            return false;
+        }
+        return flavorDAO.updateFlavorStock(flavorID, newStock);
+    }
+
     public boolean removeFlavor(Employee employee, int flavorID) {
-        if (!isManager(employee)) return false;
+        if (!isManager(employee))
+            return false;
         return flavorDAO.removeFlavor(flavorID);
     }
 
     public boolean createTopping(Employee employee, String toppingName) {
-        if (!isManager(employee)) return false;
+        if (!isManager(employee))
+            return false;
         return toppingDAO.createTopping(toppingName);
     }
 
     public boolean removeTopping(Employee employee, int toppingID) {
-        if (!isManager(employee)) return false;
+        if (!isManager(employee))
+            return false;
         return toppingDAO.removeTopping(toppingID);
     }
 
@@ -58,20 +83,25 @@ public class MixiesService {
         return orderDAO.createOrder(employee.getEmployeeID(), tip, total);
     }
 
-    public int addOrderItem(int orderID, int flavorID, int quantity, double itemCost) {
+    public int addOrderItem(int orderID, int flavorID, int quantity) {
         Order order = orderDAO.getOrderById(orderID);
         if (order == null || !"Open".equalsIgnoreCase(order.getOrderStatus())) {
             return -1;
         }
 
         IceCreamFlavor flavor = flavorDAO.getFlavorById(flavorID);
-        if (flavor == null) return -1;
-        if (flavor.isOutOfStock()) return -1;
+        if (flavor == null || flavor.isOutOfStock()) {
+            return -1;
+        }
 
         boolean stockReduced = flavorDAO.decreaseStock(flavorID, quantity);
-        if (!stockReduced) return -1;
+        if (!stockReduced) {
+            return -1;
+        }
 
+        double itemCost = SCOOP_PRICE;
         int orderItemID = orderDAO.addOrderItem(orderID, flavorID, quantity, itemCost);
+
         if (orderItemID != -1) {
             refreshOrderTotal(orderID);
         }
@@ -80,17 +110,23 @@ public class MixiesService {
     }
 
     public boolean addOrderItemTopping(int orderItemID, int toppingID, int toppingQuantity) {
-    boolean added = orderDAO.addOrderItemTopping(orderItemID, toppingID, toppingQuantity);
+        boolean added = orderDAO.addOrderItemTopping(orderItemID, toppingID, toppingQuantity);
 
-    if (added) {
-        Integer orderID = orderDAO.getOrderIdByOrderItemId(orderItemID);
-        if (orderID != null) {
-            refreshOrderTotal(orderID);
+        if (added) {
+            Integer orderID = orderDAO.getOrderIdByOrderItemId(orderItemID);
+            if (orderID != null) {
+                refreshOrderTotal(orderID);
+            }
         }
+
+        return added;
     }
 
-    return added;
-}
+    public double getDisplayedOrderItemCost(OrderItem item) {
+        double baseCost = item.getQuantity() * item.getItemCost();
+        double toppingCost = orderDAO.calculateToppingTotalForOrderItem(item.getOrderItemID());
+        return baseCost + toppingCost;
+    }
 
     public boolean refundOrderItem(int orderItemID, int orderID) {
         Order order = orderDAO.getOrderById(orderID);
@@ -119,6 +155,10 @@ public class MixiesService {
 
     public IceCreamFlavor getFlavor(int flavorID) {
         return flavorDAO.getFlavorById(flavorID);
+    }
+
+    public List<Order> getAllOrders() {
+        return orderDAO.getAllOrders();
     }
 
     private boolean isManager(Employee employee) {

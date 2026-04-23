@@ -8,8 +8,8 @@ public class IceCreamFlavor {
     private final String availabilityStatus;
 
     public IceCreamFlavor(int flavorID, String flavorName, String seasonality,
-                          int stockLevel, int remakeThreshold,
-                          String allergens, String availabilityStatus) {
+            int stockLevel, int remakeThreshold,
+            String allergens, String availabilityStatus) {
         this.flavorID = flavorID;
         this.flavorName = flavorName;
         this.seasonality = seasonality;
@@ -52,7 +52,7 @@ public class IceCreamFlavor {
     }
 
     public boolean isOutOfStock() {
-        return stockLevel <= 0 || "Unavailable".equalsIgnoreCase(availabilityStatus);
+        return stockLevel == 0;
     }
 
     @Override

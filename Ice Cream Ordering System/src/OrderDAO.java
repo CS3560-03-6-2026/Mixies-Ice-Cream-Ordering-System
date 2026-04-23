@@ -8,7 +8,7 @@ public class OrderDAO {
         String sql = "INSERT INTO Orders (employeeID, orderDate, tip, total, orderStatus) VALUES (?, NOW(), ?, ?, 'Open')";
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, employeeID);
             stmt.setDouble(2, tip);
@@ -31,7 +31,7 @@ public class OrderDAO {
         String sql = "SELECT * FROM Orders WHERE orderID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderID);
 
@@ -43,8 +43,7 @@ public class OrderDAO {
                             rs.getString("orderDate"),
                             rs.getDouble("tip"),
                             rs.getDouble("total"),
-                            rs.getString("orderStatus")
-                    );
+                            rs.getString("orderStatus"));
                 }
             }
         } catch (SQLException e) {
@@ -61,7 +60,7 @@ public class OrderDAO {
                 """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, orderID);
             stmt.setInt(2, flavorID);
@@ -88,7 +87,7 @@ public class OrderDAO {
                 """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderItemID);
             stmt.setInt(2, toppingID);
@@ -110,7 +109,7 @@ public class OrderDAO {
                 """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderItemID);
             return stmt.executeUpdate() > 0;
@@ -126,7 +125,7 @@ public class OrderDAO {
         String sql = "SELECT * FROM OrderItem WHERE orderID = ? ORDER BY orderItemID";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderID);
 
@@ -140,8 +139,7 @@ public class OrderDAO {
                                 flavor,
                                 rs.getInt("quantity"),
                                 rs.getDouble("itemCost"),
-                                rs.getString("refundStatus")
-                        ));
+                                rs.getString("refundStatus")));
                     }
                 }
             }
@@ -160,7 +158,7 @@ public class OrderDAO {
                 """;
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderID);
 
@@ -180,7 +178,7 @@ public class OrderDAO {
         String sql = "UPDATE Orders SET total = ? WHERE orderID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setDouble(1, newTotal);
             stmt.setInt(2, orderID);
@@ -196,7 +194,7 @@ public class OrderDAO {
         String sql = "UPDATE Orders SET orderStatus = 'Completed' WHERE orderID = ? AND orderStatus = 'Open'";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderID);
             return stmt.executeUpdate() > 0;
@@ -211,7 +209,7 @@ public class OrderDAO {
         String sql = "SELECT orderID FROM OrderItem WHERE orderItemID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderItemID);
 
@@ -236,7 +234,7 @@ public class OrderDAO {
                 """;
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setDouble(1, MixiesService.TOPPING_PRICE);
             stmt.setInt(2, orderID);
@@ -251,5 +249,54 @@ public class OrderDAO {
         }
 
         return 0.0;
+    }
+
+    public double calculateToppingTotalForOrderItem(int orderItemID) {
+        String sql = """
+                SELECT COALESCE(SUM(toppingQuantity * ?), 0) AS toppingTotal
+                FROM OrderItemTopping
+                WHERE orderItemID = ?
+                """;
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDouble(1, MixiesService.TOPPING_PRICE);
+            stmt.setInt(2, orderItemID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("toppingTotal");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0.0;
+    }
+
+    public List<Order> getAllOrders() {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM Orders ORDER BY orderID DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                orders.add(new Order(
+                        rs.getInt("orderID"),
+                        rs.getInt("employeeID"),
+                        rs.getString("orderDate"),
+                        rs.getDouble("tip"),
+                        rs.getDouble("total"),
+                        rs.getString("orderStatus")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return orders;
     }
 }
