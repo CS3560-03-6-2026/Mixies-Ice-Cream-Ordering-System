@@ -36,6 +36,10 @@ public class MixiesAppFrame extends JFrame {
         rightPanel.add(managerAccessButton);
         topPanel.add(rightPanel, BorderLayout.EAST);
 
+        JButton kioskMenuButton = new JButton("Kiosk Menu");
+        kioskMenuButton.addActionListener(e -> openKioskMenu());
+        rightPanel.add(kioskMenuButton);
+
         add(topPanel, BorderLayout.NORTH);
         add(tabs, BorderLayout.CENTER);
     }
@@ -71,6 +75,17 @@ public class MixiesAppFrame extends JFrame {
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid employee ID.");
+        }
+    }
+
+    private void openKioskMenu() {
+        int existingTabIndex = tabs.indexOfTab("Kiosk Menu");
+
+        if (existingTabIndex == -1) {
+            tabs.addTab("Kiosk Menu", new IceCreamFlavorPanel(service));
+            tabs.setSelectedIndex(tabs.getTabCount() - 1);
+        } else {
+            tabs.setSelectedIndex(existingTabIndex);
         }
     }
 }
