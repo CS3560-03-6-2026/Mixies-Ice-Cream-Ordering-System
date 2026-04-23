@@ -14,7 +14,7 @@ public class MixiesService {
 
     public boolean canAccessManagerScreen(int employeeID) {
         Employee employee = employeeDAO.getEmployeeById(employeeID);
-        return employee != null && "Manager".equalsIgnoreCase(employee.getEmployeeRole());
+        return employee != null && employee.getEmployeeRole() == employeeRoles.MANAGER;
     }
 
     public List<IceCreamFlavor> getAllFlavors() {
