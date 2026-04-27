@@ -213,7 +213,7 @@ public class OrderDAO {
      */
     public double calculateOrderTotal(int orderID) {
         String sql = """
-                SELECT COALESCE(SUM(quantity * itemCost), 0) AS total
+                SELECT COALESCE(SUM(itemCost), 0) AS total
                 FROM OrderItem
                 WHERE orderID = ? AND refundStatus = 'Not Refunded'
                 """;
@@ -309,7 +309,7 @@ public class OrderDAO {
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setDouble(1, MixiesService.TOPPING_PRICE);
+            stmt.setDouble(1, Prices.TOPPING_PRICE);
             stmt.setInt(2, orderID);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -337,7 +337,7 @@ public class OrderDAO {
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setDouble(1, MixiesService.TOPPING_PRICE);
+            stmt.setDouble(1, Prices.TOPPING_PRICE);
             stmt.setInt(2, orderItemID);
 
             try (ResultSet rs = stmt.executeQuery()) {
