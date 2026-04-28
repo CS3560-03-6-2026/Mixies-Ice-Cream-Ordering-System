@@ -12,10 +12,6 @@ import java.util.List;
  */
 public class MixiesService {
 
-    // Constant price values used throughout the system
-    public static final double TOPPING_PRICE = 0.50;
-    public static final double SCOOP_PRICE = 3.50;
-
     // Data Access Objects (DAO) for interacting with the database
     private final FlavorDAO flavorDAO = new FlavorDAO();
     private final ToppingDAO toppingDAO = new ToppingDAO();
@@ -172,7 +168,7 @@ public class MixiesService {
         }
 
         // Add item with base scoop price
-        double itemCost = SCOOP_PRICE;
+        double itemCost = Prices.SCOOP_PRICES[quantity];
         int orderItemID = orderDAO.addOrderItem(orderID, flavorID, quantity, itemCost);
 
         // Update order total if successful
@@ -203,7 +199,7 @@ public class MixiesService {
      * Calculates the displayed cost of an order item (including toppings).
      */
     public double getDisplayedOrderItemCost(OrderItem item) {
-        double baseCost = item.getQuantity() * item.getItemCost();
+        double baseCost = Prices.SCOOP_PRICES[item.getQuantity()];
         double toppingCost = orderDAO.calculateToppingTotalForOrderItem(item.getOrderItemID());
         return baseCost + toppingCost;
     }
