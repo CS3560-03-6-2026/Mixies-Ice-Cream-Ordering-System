@@ -41,6 +41,10 @@ public class CartPanel extends JPanel {
         JButton backButton = new JButton("Back to Menu");
         backButton.addActionListener(e -> navigator.showMenu());
 
+        // Button removes the selected item from the cart
+        JButton removeButton = new JButton("Remove Item");
+        removeButton.addActionListener(e -> removeSelectedItem());
+
         // Button moves user to checkout screen
         JButton checkoutButton = new JButton("Checkout");
         checkoutButton.addActionListener(e -> {
@@ -57,6 +61,7 @@ public class CartPanel extends JPanel {
 
         JPanel buttons = new JPanel();
         buttons.add(backButton);
+        buttons.add(removeButton);
         buttons.add(checkoutButton);
 
         bottomPanel.add(subtotalLabel, BorderLayout.WEST);
@@ -97,6 +102,39 @@ public class CartPanel extends JPanel {
         }
 
         subtotalLabel.setText(String.format("Subtotal: $%.2f", subtotal));
+    }
+
+    // Removes the selected cart item from the order
+    private void removeSelectedItem() {
+        int selectedRow = cartTable.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Select an item first.");
+            return;
+        }
+
+        int orderID = session.getCurrentOrderID();
+        int orderItemID = (int) cartTableModel.getValueAt(selectedRow, 0);
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Remove selected item from cart?",
+                "Confirm Remove",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        boolean removed = service.removeOrderItem(orderItemID, orderID);
+
+        JOptionPane.showMessageDialog(
+                this,
+                removed ? "Item removed." : "Could not remove item."
+        );
+
+        refreshCart();
     }
 
     // Automatically refresh cart whenever this panel becomes visible

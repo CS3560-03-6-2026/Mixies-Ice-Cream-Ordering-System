@@ -272,4 +272,14 @@ public class MixiesService {
         return employee != null &&
                (employee.getEmployeeRole() == employeeRoles.MANAGER);
     }
+
+    public boolean removeOrderItem(int orderItemID, int orderID) {
+        boolean removed = orderDAO.removeOrderItem(orderItemID);
+
+        if (removed) {
+            refreshOrderTotal(orderID);
+        }
+
+        return removed;
+    }
 }
