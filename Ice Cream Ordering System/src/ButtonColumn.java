@@ -3,6 +3,7 @@ import java.util.function.IntConsumer;
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import java.util.function.IntPredicate;
 
 public class ButtonColumn extends AbstractCellEditor
         implements TableCellRenderer, TableCellEditor {
@@ -11,12 +12,16 @@ public class ButtonColumn extends AbstractCellEditor
     private final JButton editButton = new JButton();
     private String label;
     private int currentRow;
+    private final IntPredicate isEnabled; // decides if button is active per row
 
-    public ButtonColumn(JTable table, IntConsumer action, int column) {
+    public ButtonColumn(JTable table, IntConsumer action, IntPredicate isEnabled, int column) {
+        this.isEnabled = isEnabled;
+
         editButton.addActionListener(e -> {
-            action.accept(currentRow); // pass the row to the caller
+            action.accept(currentRow);
             fireEditingStopped();
         });
+
         table.getColumnModel().getColumn(column).setCellRenderer(this);
         table.getColumnModel().getColumn(column).setCellEditor(this);
     }
@@ -26,6 +31,7 @@ public class ButtonColumn extends AbstractCellEditor
             JTable table, Object value, boolean isSelected,
             boolean hasFocus, int row, int column) {
         renderButton.setText(value == null ? "" : value.toString());
+        renderButton.setEnabled(isEnabled.test(row));
         return renderButton;
     }
 
@@ -34,7 +40,8 @@ public class ButtonColumn extends AbstractCellEditor
             JTable table, Object value, boolean isSelected, int row, int column) {
         label = value == null ? "" : value.toString();
         editButton.setText(label);
-        currentRow = row; // capture the row here, before the click fires
+        editButton.setEnabled(isEnabled.test(row));
+        currentRow = row;
         return editButton;
     }
 

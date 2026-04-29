@@ -58,6 +58,9 @@ public class OrdersPanel extends JPanel {
         completeButtonColumn = new ButtonColumn(ordersTable, row -> {
             int orderID = (int) ordersTableModel.getValueAt(row, 0);
             completeOrder(orderID);
+        }, row -> {
+            String status = (String) ordersTableModel.getValueAt(row, 2);
+            return "Open".equalsIgnoreCase(status);
         }, 3);
 
         // Button actions
@@ -110,8 +113,7 @@ public class OrdersPanel extends JPanel {
         new OrderDetailsDialog(
                 (Frame) SwingUtilities.getWindowAncestor(this),
                 service,
-                orderID
-        ).setVisible(true);
+                orderID).setVisible(true);
 
         // Refresh orders after closing dialog (in case changes were made)
         refreshOrders();

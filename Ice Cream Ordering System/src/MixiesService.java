@@ -149,9 +149,9 @@ public class MixiesService {
      */
     public int addOrderItem(int orderID, int flavorID, int quantity) {
 
-        // Ensure order exists and is still open
+        // Ensure order exists and has ordering status
         Order order = orderDAO.getOrderById(orderID);
-        if (order == null || !"Open".equalsIgnoreCase(order.getOrderStatus())) {
+        if (order == null || !"Ordering".equalsIgnoreCase(order.getOrderStatus())) {
             return -1;
         }
 
@@ -223,12 +223,21 @@ public class MixiesService {
         return refunded;
     }
 
+    public boolean checkoutOrder(int orderID) {
+        refreshOrderTotal(orderID);
+        return orderDAO.checkoutOrder(orderID);
+    }
+
     /**
      * Finalizes an order and updates the total before closing it.
      */
     public boolean concludeOrder(int orderID) {
         refreshOrderTotal(orderID);
         return orderDAO.concludeOrder(orderID);
+    }
+
+    public boolean cancelOrder(int orderID) {
+        return orderDAO.cancelOrder(orderID);
     }
 
     /**
@@ -273,7 +282,7 @@ public class MixiesService {
      */
     private boolean isManager(Employee employee) {
         return employee != null &&
-               (employee.getEmployeeRole() == employeeRoles.MANAGER);
+                (employee.getEmployeeRole() == employeeRoles.MANAGER);
     }
 
     public boolean removeOrderItem(int orderItemID, int orderID) {

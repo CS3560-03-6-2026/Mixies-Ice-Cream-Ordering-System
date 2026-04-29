@@ -156,18 +156,20 @@ public class CheckoutPanel extends JPanel {
         service.updateOrderTip(orderID, tipAmount);
         service.refreshOrderTotal(orderID);
 
-        boolean completed = service.concludeOrder(orderID);
+        boolean checked_out = service.checkoutOrder(orderID);
 
-        if (completed) {
-            JOptionPane.showMessageDialog(this, "Order completed.");
+        if (checked_out) {
 
+            JOptionPane.showMessageDialog(this, "Order confirmed! Total: $" + String.format("%.2f", total + tipAmount));
             ordersPanel.refreshOrders();
             session.reset();
 
             navigator.showWelcome();
+
         } else {
-            JOptionPane.showMessageDialog(this, "Could not complete order.");
+            JOptionPane.showMessageDialog(this, "Could not confirm order.");
         }
+
     }
 
     // Automatically refresh checkout data when this panel becomes visible

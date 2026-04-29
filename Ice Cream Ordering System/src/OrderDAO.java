@@ -21,7 +21,7 @@ public class OrderDAO {
      * @return the generated order ID, or -1 if failed
      */
     public int createOrder(int employeeID, double tip, double total) {
-        String sql = "INSERT INTO Orders (employeeID, orderDate, tip, total, orderStatus) VALUES (?, NOW(), ?, ?, 'Open')";
+        String sql = "INSERT INTO Orders (employeeID, orderDate, tip, total, orderStatus) VALUES (?, NOW(), ?, ?, 'Ordering')";
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -255,10 +255,46 @@ public class OrderDAO {
     }
 
     /**
+     * Checks out an order, changing its status to 'Open'.
+     * 
+     * @param orderID The ID of the order to check out
+     * @return true if the order was successfully checked out, false otherwise
+     */
+    public boolean checkoutOrder(int orderID) {
+        String sql = "UPDATE Orders SET orderStatus = 'Open' WHERE orderID = ? AND orderStatus = 'Ordering'";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, orderID);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
      * Marks an order as completed.
      */
     public boolean concludeOrder(int orderID) {
         String sql = "UPDATE Orders SET orderStatus = 'Completed' WHERE orderID = ? AND orderStatus = 'Open'";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, orderID);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean cancelOrder(int orderID) {
+        String sql = "UPDATE Orders SET orderStatus = 'Cancelled' WHERE orderID = ? AND orderStatus IN ('Ordering')";
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {

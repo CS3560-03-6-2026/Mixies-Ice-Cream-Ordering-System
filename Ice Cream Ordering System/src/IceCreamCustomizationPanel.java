@@ -25,6 +25,9 @@ public class IceCreamCustomizationPanel extends JPanel {
     // Spinner to select number of scoops (1-3)
     private final JSpinner scoopSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 3, 1));
 
+    // Label to display cost based on number of scoops
+    private final JLabel costLabel = new JLabel("Cost: $3.50", SwingConstants.CENTER);
+
     // Panel that holds topping cards (populated from DB)
     private final JPanel toppingCardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
@@ -59,12 +62,21 @@ public class IceCreamCustomizationPanel extends JPanel {
         bottomPanel.add(addToCartButton);
 
         // Scoop selector row
+        // Updates cost label whenever number of scoops changes
+        {
+            scoopSpinner.addChangeListener(e -> {
+                int scoops = (int) scoopSpinner.getValue();
+                double cost = Prices.SCOOP_PRICES[scoops];
+                costLabel.setText(String.format("Cost: $%.2f", cost));
+            });
+        }
         JPanel scoopPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel scoopLabel = new JLabel("Number of Scoops:");
         scoopLabel.setFont(new Font("SansSerif", Font.PLAIN, 16));
         scoopSpinner.setPreferredSize(new Dimension(60, 30));
         scoopPanel.add(scoopLabel);
         scoopPanel.add(scoopSpinner);
+        scoopPanel.add(costLabel);
 
         // Toppings label
         JLabel toppingTitle = new JLabel("Select Toppings:", SwingConstants.CENTER);
@@ -119,8 +131,8 @@ public class IceCreamCustomizationPanel extends JPanel {
         JLabel imageLabel = new JLabel();
         try {
             String path = "src/images/" + topping.getToppingName()
-                .toLowerCase()
-                .replaceAll(" ", "") + "-topping.png";
+                    .toLowerCase()
+                    .replaceAll(" ", "") + "-topping.png";
 
             Image img = new ImageIcon(path).getImage()
                     .getScaledInstance(100, 100, Image.SCALE_SMOOTH);
@@ -161,7 +173,7 @@ public class IceCreamCustomizationPanel extends JPanel {
         toppings = service.getAllToppings();
 
         for (Topping topping : toppings) {
-            JCheckBox checkBox = new JCheckBox("Add");
+            JCheckBox checkBox = new JCheckBox("Add +$0.50");
             checkBox.setFont(new Font("SansSerif", Font.PLAIN, 13));
             toppingCheckboxes.add(checkBox);
             toppingCardPanel.add(createToppingCard(topping, checkBox));
@@ -227,8 +239,7 @@ public class IceCreamCustomizationPanel extends JPanel {
         int orderItemID = service.addOrderItem(
                 orderID,
                 flavor.getFlavorID(),
-                scoops
-        );
+                scoops);
 
         if (orderItemID == -1) {
             JOptionPane.showMessageDialog(this, "Could not add item.");

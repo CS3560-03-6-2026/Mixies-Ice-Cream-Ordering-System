@@ -23,7 +23,7 @@ public class OrderDetailsDialog extends JDialog {
 
     // Table model for displaying order items (non-editable)
     private final DefaultTableModel itemsTableModel = new DefaultTableModel(
-            new Object[] { "OrderItem ID", "Flavor", "Quantity", "Cost", "Refund Status" }, 0) {
+            new Object[] { "OrderItem ID", "Flavor", "Scoops", "Cost", "Refund Status" }, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return false; // Prevent editing in table
