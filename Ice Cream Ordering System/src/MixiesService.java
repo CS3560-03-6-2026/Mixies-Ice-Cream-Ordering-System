@@ -247,8 +247,9 @@ public class MixiesService {
         double itemTotal = orderDAO.calculateOrderTotal(orderID);
         double toppingTotal = orderDAO.calculateOrderToppingTotal(orderID);
         double tip = orderDAO.getOrderTip(orderID);
-
-        return itemTotal + toppingTotal + tip;
+        double subtotal = itemTotal + toppingTotal;
+        double tax = subtotal * Prices.TAX_RATE;
+        return itemTotal + toppingTotal + tax + tip;
     }
 
     /**

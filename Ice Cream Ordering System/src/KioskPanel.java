@@ -43,8 +43,10 @@ public class KioskPanel extends JPanel {
     private JPanel buildWelcomeScreen() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        JLabel title = new JLabel("Welcome to Mixies", SwingConstants.CENTER);
-        title.setFont(new Font("SansSerif", Font.BOLD, 28));
+        ImageIcon icon = new ImageIcon("src/images/mixies-logo.png");
+        Image scaled = icon.getImage().getScaledInstance(300, 120, Image.SCALE_SMOOTH);
+        JLabel logoLabel = new JLabel(new ImageIcon(scaled));
+        logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         JButton startButton = new JButton("Start Order");
         startButton.setPreferredSize(new Dimension(180, 60));
@@ -67,8 +69,9 @@ public class KioskPanel extends JPanel {
         JPanel center = new JPanel();
         center.add(startButton);
 
-        panel.add(title, BorderLayout.NORTH);
+        panel.add(logoLabel, BorderLayout.NORTH);
         panel.add(center, BorderLayout.CENTER);
+
         return panel;
     }
 }

@@ -17,6 +17,7 @@ public class CheckoutPanel extends JPanel {
 
     // Labels used to display the order totals
     private final JLabel subtotalLabel = new JLabel("Subtotal: $0.00");
+    private final JLabel taxLabel = new JLabel("Tax: $0.00");
     private final JLabel tipLabel = new JLabel("Tip: $0.00");
     private final JLabel totalLabel = new JLabel("Total: $0.00");
 
@@ -36,7 +37,7 @@ public class CheckoutPanel extends JPanel {
         title.setFont(new Font("SansSerif", Font.BOLD, 22));
 
         // Center panel displays subtotal, tip, total, and payment method
-        JPanel centerPanel = new JPanel(new GridLayout(5, 1, 10, 10));
+        JPanel centerPanel = new JPanel(new GridLayout(6, 1, 10, 10));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         // Tip selection panel
@@ -65,6 +66,7 @@ public class CheckoutPanel extends JPanel {
 
         // Add total/payment components to center panel
         centerPanel.add(subtotalLabel);
+        centerPanel.add(taxLabel);
         centerPanel.add(tipLabel);
         centerPanel.add(totalLabel);
         centerPanel.add(paymentLabel);
@@ -117,9 +119,11 @@ public class CheckoutPanel extends JPanel {
     // Updates subtotal, tip, and total labels
     private void updateLabels() {
         double tipAmount = subtotal * session.getSelectedTip();
-        double total = subtotal + tipAmount;
+        double tax = subtotal * Prices.TAX_RATE;
+        double total = subtotal + tax + tipAmount;
 
         subtotalLabel.setText(String.format("Subtotal: $%.2f", subtotal));
+        taxLabel.setText(String.format("Tax: $%.2f", tax));
         tipLabel.setText(String.format("Tip: $%.2f", tipAmount));
         totalLabel.setText(String.format("Total: $%.2f", total));
     }

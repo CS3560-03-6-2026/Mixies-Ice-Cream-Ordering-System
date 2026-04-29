@@ -21,7 +21,7 @@ public class OrdersPanel extends JPanel {
 
     // Table model for displaying orders (non-editable)
     private final DefaultTableModel ordersTableModel = new DefaultTableModel(
-            new Object[] { "Order ID", "Total", "Status", "Actions" }, 0) {
+        new Object[] { "Order ID", "Total", "Status", "Actions" }, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return column == 3; // Only the button column is editable
