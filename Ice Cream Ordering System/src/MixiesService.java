@@ -55,6 +55,13 @@ public class MixiesService {
     }
 
     /**
+     * Retrieves all order items for a specific order, including their toppings.
+     */
+    public List<OrderItem> getOrderItemsWithToppingsForOrder(int orderID) {
+        return orderDAO.getOrderItemsWithToppingsForOrder(orderID, flavorDAO, toppingDAO);
+    }
+
+    /**
      * Retrieves a specific order by ID.
      */
     public Order getOrder(int orderID) {

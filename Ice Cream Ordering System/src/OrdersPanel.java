@@ -51,6 +51,23 @@ public class OrdersPanel extends JPanel {
         top.add(refreshButton);
         top.add(viewDetailsButton);
 
+        // Configure orders table
+        ordersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        ordersTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent mouseEvent) {
+                JTable table =(JTable) mouseEvent.getSource();
+                Point point = mouseEvent.getPoint();
+                int row = table.rowAtPoint(point);
+                if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1 && row != -1) {
+                    int modelRow = table.convertRowIndexToModel(row);
+
+                    int orderID = (int) ordersTableModel.getValueAt(modelRow, 0);
+                    viewSelectedOrder(orderID);
+                }
+            }
+        });
+
         // Add components to panel
         add(top, BorderLayout.NORTH);
         add(new JScrollPane(ordersTable), BorderLayout.CENTER);
@@ -116,6 +133,21 @@ public class OrdersPanel extends JPanel {
                 orderID).setVisible(true);
 
         // Refresh orders after closing dialog (in case changes were made)
+        refreshOrders();
+    }
+
+    private void viewSelectedOrder(int orderID) {
+
+        if (orderID == -1) {
+            JOptionPane.showMessageDialog(this, "Select an order first.");
+            return;
+        }
+
+        new OrderDetailsDialog(
+                (Frame) SwingUtilities.getWindowAncestor(this),
+                service,
+                orderID).setVisible(true);
+
         refreshOrders();
     }
 

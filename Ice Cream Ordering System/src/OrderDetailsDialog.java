@@ -1,7 +1,7 @@
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * OrderDetailsDialog is a modal dialog that displays all items
@@ -23,7 +23,7 @@ public class OrderDetailsDialog extends JDialog {
 
     // Table model for displaying order items (non-editable)
     private final DefaultTableModel itemsTableModel = new DefaultTableModel(
-            new Object[] { "OrderItem ID", "Flavor", "Scoops", "Cost", "Refund Status" }, 0) {
+            new Object[] { "OrderItem ID", "Flavor", "Scoops", "Modifiers", "Cost", "Refund Status" }, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return false; // Prevent editing in table
@@ -79,7 +79,7 @@ public class OrderDetailsDialog extends JDialog {
         itemsTableModel.setRowCount(0);
 
         // Fetch updated order items
-        List<OrderItem> items = service.getOrderItemsForOrder(orderID);
+        List<OrderItem> items = service.getOrderItemsWithToppingsForOrder(orderID);
 
         // Populate table with item data
         for (OrderItem item : items) {
@@ -87,7 +87,8 @@ public class OrderDetailsDialog extends JDialog {
                     item.getOrderItemID(),
                     item.getFlavor().getFlavorName(),
                     item.getQuantity(),
-                    service.getDisplayedOrderItemCost(item),
+                    String.join(", ", item.getToppings().stream().map(t -> t.getTopping().getToppingName()).toList()),
+                    String.format("$%.2f", service.getDisplayedOrderItemCost(item)),
                     item.getRefundStatus()
             });
         }

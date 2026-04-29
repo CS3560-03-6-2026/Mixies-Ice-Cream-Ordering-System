@@ -51,6 +51,20 @@ public class OrderItem {
         this.toppings = new ArrayList<>();
     }
 
+    /**
+     * Overloaded constructor allows initializing with a list of toppings.
+     */
+    public OrderItem(int orderItemID, int orderID, IceCreamFlavor flavor,
+                     int quantity, double itemCost, String refundStatus, List<OrderItemTopping> toppings) {
+        this.orderItemID = orderItemID;
+        this.orderID = orderID;
+        this.flavor = flavor;
+        this.quantity = quantity;
+        this.itemCost = itemCost;
+        this.refundStatus = refundStatus;
+        this.toppings = toppings;
+    }
+
     // Returns the order item ID
     public int getOrderItemID() {
         return orderItemID;

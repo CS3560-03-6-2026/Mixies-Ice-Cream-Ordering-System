@@ -40,6 +40,28 @@ public class ToppingDAO {
         return toppings;
     }
 
+    public Topping getToppingById(int toppingID) {
+        String sql = "SELECT * FROM Topping WHERE toppingID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, toppingID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Topping(
+                            rs.getInt("toppingID"),
+                            rs.getString("toppingName")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     /**
      * Inserts a new topping into the database.
      * 

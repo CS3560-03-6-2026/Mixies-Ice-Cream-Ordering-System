@@ -209,6 +209,52 @@ public class OrderDAO {
     }
 
     /**
+     * Retrieves all order items for a given order, including their toppings.
+     * @param orderID
+     * @return List of OrderItem objects with toppings populated
+     */
+    public List<OrderItem> getOrderItemsWithToppingsForOrder(int orderID, FlavorDAO flavorDAO, ToppingDAO toppingDAO) {
+        List<OrderItem> items = getOrderItemsForOrder(orderID, flavorDAO);
+
+        // For each order item, retrieve its toppings
+        for (OrderItem item : items) {
+            List<OrderItemTopping> toppings = getToppingsForOrderItem(item.getOrderItemID(), toppingDAO);
+            item.getToppings().addAll(toppings);
+        }
+
+        return items;
+    }
+
+    public List<OrderItemTopping> getToppingsForOrderItem(int orderItemID, ToppingDAO toppingDAO) {
+        List<OrderItemTopping> toppings = new ArrayList<>();
+        String sql = "SELECT * FROM OrderItemTopping WHERE orderItemID = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, orderItemID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Retrieve topping object using ToppingDAO
+                    Topping topping = toppingDAO.getToppingById(rs.getInt("toppingID"));
+
+                    if (topping != null) {
+                        toppings.add(new OrderItemTopping(
+                                rs.getInt("orderItemID"),
+                                topping,
+                                rs.getInt("toppingQuantity")));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return toppings;
+    }
+
+    /**
      * Calculates total cost of all non-refunded items in an order.
      */
     public double calculateOrderTotal(int orderID) {
@@ -254,58 +300,52 @@ public class OrderDAO {
         }
     }
 
-    /**
-     * Checks out an order, changing its status to 'Open'.
-     * 
-     * @param orderID The ID of the order to check out
-     * @return true if the order was successfully checked out, false otherwise
+    /** Util method for changing order status
+     * @param orderID The ID of the order to update
+     * @param newStatus The new status to set (e.g., "Open", "Completed", "Cancelled")
+     * @param validCurrentStatuses A list of valid current statuses that allow the update (e.g., ["Ordering"])
+     * @return true if the order status was successfully updated, false otherwise
      */
-    public boolean checkoutOrder(int orderID) {
-        String sql = "UPDATE Orders SET orderStatus = 'Open' WHERE orderID = ? AND orderStatus = 'Ordering'";
+    public boolean updateOrderStatus(int orderID, String newStatus, List<String> validCurrentStatuses) {
+        String sql = "UPDATE Orders SET orderStatus = ? WHERE orderID = ? AND orderStatus IN ("
+                + String.join(", ", validCurrentStatuses.stream().map(s -> "?").toArray(String[]::new)) + ")";
 
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, orderID);
+            stmt.setString(1, newStatus);
+            stmt.setInt(2, orderID);
+            for (int i = 0; i < validCurrentStatuses.size(); i++) {
+                stmt.setString(3 + i, validCurrentStatuses.get(i));
+            }
+
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * Checks out an order, changing its status to 'Open'.
+     */
+    public boolean checkoutOrder(int orderID) {
+        return updateOrderStatus(orderID, "Open", List.of("Ordering"));
     }
 
     /**
      * Marks an order as completed.
      */
     public boolean concludeOrder(int orderID) {
-        String sql = "UPDATE Orders SET orderStatus = 'Completed' WHERE orderID = ? AND orderStatus = 'Open'";
-
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, orderID);
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return updateOrderStatus(orderID, "Completed", List.of("Open"));
     }
 
+    /**
+     * Cancels an order, changing its status to 'Cancelled'.
+     */
     public boolean cancelOrder(int orderID) {
-        String sql = "UPDATE Orders SET orderStatus = 'Cancelled' WHERE orderID = ? AND orderStatus IN ('Ordering')";
-
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, orderID);
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return updateOrderStatus(orderID, "Cancelled", List.of("Ordering"));
     }
 
     /**
