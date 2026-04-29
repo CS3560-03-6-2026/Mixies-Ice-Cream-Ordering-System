@@ -4,9 +4,9 @@
  * It includes a back-to-cart button and a confirm order button.
  */
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
 
 public class CheckoutPanel extends JPanel {
 
@@ -137,6 +137,13 @@ public class CheckoutPanel extends JPanel {
 
         if (items.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Add at least one item first.");
+            return;
+        }
+
+        double total = service.getOrderTotal(orderID);
+
+        if (total == 0.0) {
+            JOptionPane.showMessageDialog(this, "Order total is zero.");
             return;
         }
 

@@ -232,15 +232,21 @@ public class MixiesService {
     }
 
     /**
-     * Recalculates and updates the total cost of an order.
+     * Calculates the total for an order and returns it.
      */
-    public void refreshOrderTotal(int orderID) {
+    public double getOrderTotal(int orderID) {
         double itemTotal = orderDAO.calculateOrderTotal(orderID);
         double toppingTotal = orderDAO.calculateOrderToppingTotal(orderID);
         double tip = orderDAO.getOrderTip(orderID);
 
-        double total = itemTotal + toppingTotal + tip;
-        orderDAO.updateOrderTotal(orderID, total);
+        return itemTotal + toppingTotal + tip;
+    }
+
+    /**
+     * Recalculates and updates the total cost of an order.
+     */
+    public void refreshOrderTotal(int orderID) {
+        orderDAO.updateOrderTotal(orderID, getOrderTotal(orderID));
     }
 
     public boolean updateOrderTip(int orderID, double tip) {

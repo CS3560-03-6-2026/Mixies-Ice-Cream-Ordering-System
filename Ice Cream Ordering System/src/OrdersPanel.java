@@ -1,7 +1,7 @@
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * OrdersPanel displays a list of all orders in the system.
@@ -21,15 +21,17 @@ public class OrdersPanel extends JPanel {
 
     // Table model for displaying orders (non-editable)
     private final DefaultTableModel ordersTableModel = new DefaultTableModel(
-            new Object[] { "Order ID", "Total", "Status" }, 0) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false; // Prevent editing table cells
-        }
-    };
+        new Object[] { "Order ID", "Total", "Status", "Actions" }, 0) {
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return column == 3; // Only the button column is editable
+    }
+};
 
     // Table displaying all orders
     private final JTable ordersTable = new JTable(ordersTableModel);
+
+    private final ButtonColumn completeButtonColumn;
 
     /**
      * Constructor initializes UI components and event handlers.
@@ -53,6 +55,11 @@ public class OrdersPanel extends JPanel {
         add(top, BorderLayout.NORTH);
         add(new JScrollPane(ordersTable), BorderLayout.CENTER);
 
+        completeButtonColumn = new ButtonColumn(ordersTable, row -> {
+            int orderID = (int) ordersTableModel.getValueAt(row, 0);
+            completeOrder(orderID);
+        }, 3);
+
         // Button actions
         refreshButton.addActionListener(e -> refreshOrders());
         viewDetailsButton.addActionListener(e -> viewSelectedOrder());
@@ -64,7 +71,7 @@ public class OrdersPanel extends JPanel {
     /**
      * Reloads all orders from the service and updates the table.
      */
-    public void refreshOrders() {
+    public final void refreshOrders() {
 
         // Clear existing rows
         ordersTableModel.setRowCount(0);
@@ -72,12 +79,13 @@ public class OrdersPanel extends JPanel {
         // Fetch all orders
         List<Order> orders = service.getAllOrders();
 
-        // Populate table with order data
+        // Populate table with order data, and buttons to complete order
         for (Order order : orders) {
             ordersTableModel.addRow(new Object[] {
                     order.getOrderID(),
                     order.getTotal(),
-                    order.getOrderStatus()
+                    order.getOrderStatus(),
+                    "Complete",
             });
         }
     }
@@ -106,6 +114,14 @@ public class OrdersPanel extends JPanel {
         ).setVisible(true);
 
         // Refresh orders after closing dialog (in case changes were made)
+        refreshOrders();
+    }
+
+    private void completeOrder(int orderID) {
+        // Mark the order as completed in the service
+        service.concludeOrder(orderID);
+
+        // Refresh the orders list to reflect changes
         refreshOrders();
     }
 }

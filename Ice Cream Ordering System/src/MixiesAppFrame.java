@@ -25,7 +25,10 @@ public class MixiesAppFrame extends JFrame {
 
     private final OrdersPanel ordersPanel;
 
+    //Employee access
     JButton employeeAccessButton;
+
+    JLabel loggedInLabel;
 
     /**
      * Constructor initializes the main application frame and UI components.
@@ -49,10 +52,7 @@ public class MixiesAppFrame extends JFrame {
         employeeAccessButton.addActionListener(e -> employeeIDPrompt());
 
         // Label displaying logged-in employee info
-        JLabel loggedInLabel = new JLabel(
-                "Logged in: " + loggedInEmployee.getEmployeeName() +
-                " (" + loggedInEmployee.getEmployeeRole() + ")"
-        );
+        this.loggedInLabel = new JLabel("");
 
         // Top panel containing user info and action buttons
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -88,8 +88,14 @@ public class MixiesAppFrame extends JFrame {
             employeeAccessButton.setText("Sign Out (" + employee.getEmployeeName() + ")");
             employeeAccessButton.removeActionListener(employeeAccessButton.getActionListeners()[0]);
             employeeAccessButton.addActionListener(e -> employeeSignOut());
+            
+            //Changed logged in label to show employee name and role
+            loggedInLabel.setText(
+                "Logged in: " + employee.getEmployeeName() +
+                " (" + employee.getEmployeeRole() + ")"
+            );
 
-            // Open employee access panel (not implemented yet)
+            // Open employee access panel
             openEmployeeAccess(employee);
             
             // If employee is a manager, also open manager access
@@ -150,6 +156,8 @@ public class MixiesAppFrame extends JFrame {
         if (managerTabIndex != -1) {
             tabs.removeTabAt(managerTabIndex);
         }
+
+        loggedInLabel.setText("");
 
         // Reset employee access button
         employeeAccessButton.setText("Employee Access");
