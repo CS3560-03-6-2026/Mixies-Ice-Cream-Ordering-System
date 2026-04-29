@@ -210,7 +210,7 @@ public class EmployeeOrderPanel extends JPanel {
 
         // Make sure order is still open
         Order currentOrder = service.getOrder(currentOrderID);
-        if (currentOrder == null || !"Open".equalsIgnoreCase(currentOrder.getOrderStatus())) {
+        if (currentOrder == null || !"Ordering".equalsIgnoreCase(currentOrder.getOrderStatus())) {
             JOptionPane.showMessageDialog(this, "Cannot add items. Order is already completed.");
             return;
         }
@@ -317,7 +317,7 @@ public class EmployeeOrderPanel extends JPanel {
 
         // Order must still be open
         Order currentOrder = service.getOrder(currentOrderID);
-        if (currentOrder == null || !"Open".equalsIgnoreCase(currentOrder.getOrderStatus())) {
+        if (currentOrder == null || !"Ordering".equalsIgnoreCase(currentOrder.getOrderStatus())) {
             JOptionPane.showMessageDialog(this, "Cannot add toppings. Order is already completed.");
             return;
         }

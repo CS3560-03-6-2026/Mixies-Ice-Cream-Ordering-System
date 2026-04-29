@@ -23,7 +23,7 @@ public class CheckoutPanel extends JPanel {
     private double subtotal = 0.0;
 
     public CheckoutPanel(MixiesService service, KioskSession session,
-                         KioskNavigator navigator, OrdersPanel ordersPanel) {
+            KioskNavigator navigator, OrdersPanel ordersPanel) {
         this.service = service;
         this.session = session;
         this.navigator = navigator;
@@ -61,7 +61,7 @@ public class CheckoutPanel extends JPanel {
         // Payment method section
         JLabel paymentLabel = new JLabel("Select Payment Method:");
 
-        JComboBox<String> paymentBox = new JComboBox<>(new String[]{"Cash", "Credit Card", "Debit Card"});
+        JComboBox<String> paymentBox = new JComboBox<>(new String[] { "Cash", "Credit Card", "Debit Card" });
 
         // Add total/payment components to center panel
         centerPanel.add(subtotalLabel);
@@ -152,18 +152,20 @@ public class CheckoutPanel extends JPanel {
         service.updateOrderTip(orderID, tipAmount);
         service.refreshOrderTotal(orderID);
 
-        boolean completed = service.concludeOrder(orderID);
+        boolean checked_out = service.checkoutOrder(orderID);
 
-        if (completed) {
-            JOptionPane.showMessageDialog(this, "Order completed.");
+        if (checked_out) {
 
+            JOptionPane.showMessageDialog(this, "Order confirmed! Total: $" + String.format("%.2f", total + tipAmount));
             ordersPanel.refreshOrders();
             session.reset();
 
             navigator.showWelcome();
+
         } else {
-            JOptionPane.showMessageDialog(this, "Could not complete order.");
+            JOptionPane.showMessageDialog(this, "Could not confirm order.");
         }
+
     }
 
     // Automatically refresh checkout data when this panel becomes visible

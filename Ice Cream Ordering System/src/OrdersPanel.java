@@ -21,12 +21,12 @@ public class OrdersPanel extends JPanel {
 
     // Table model for displaying orders (non-editable)
     private final DefaultTableModel ordersTableModel = new DefaultTableModel(
-        new Object[] { "Order ID", "Total", "Status", "Actions" }, 0) {
-    @Override
-    public boolean isCellEditable(int row, int column) {
-        return column == 3; // Only the button column is editable
-    }
-};
+            new Object[] { "Order ID", "Total", "Status", "Actions" }, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return column == 3; // Only the button column is editable
+        }
+    };
 
     // Table displaying all orders
     private final JTable ordersTable = new JTable(ordersTableModel);
@@ -58,6 +58,9 @@ public class OrdersPanel extends JPanel {
         completeButtonColumn = new ButtonColumn(ordersTable, row -> {
             int orderID = (int) ordersTableModel.getValueAt(row, 0);
             completeOrder(orderID);
+        }, row -> {
+            String status = (String) ordersTableModel.getValueAt(row, 2);
+            return !"Completed".equalsIgnoreCase(status);
         }, 3);
 
         // Button actions
@@ -110,8 +113,7 @@ public class OrdersPanel extends JPanel {
         new OrderDetailsDialog(
                 (Frame) SwingUtilities.getWindowAncestor(this),
                 service,
-                orderID
-        ).setVisible(true);
+                orderID).setVisible(true);
 
         // Refresh orders after closing dialog (in case changes were made)
         refreshOrders();
