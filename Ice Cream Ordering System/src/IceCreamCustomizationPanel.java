@@ -173,7 +173,7 @@ public class IceCreamCustomizationPanel extends JPanel {
         toppings = service.getAllToppings();
 
         for (Topping topping : toppings) {
-            JCheckBox checkBox = new JCheckBox("Add");
+            JCheckBox checkBox = new JCheckBox("Add +$0.50");
             checkBox.setFont(new Font("SansSerif", Font.PLAIN, 13));
             toppingCheckboxes.add(checkBox);
             toppingCardPanel.add(createToppingCard(topping, checkBox));
