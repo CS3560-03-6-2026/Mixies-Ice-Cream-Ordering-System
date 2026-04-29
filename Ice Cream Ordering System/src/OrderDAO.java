@@ -77,7 +77,7 @@ public class OrderDAO {
         String sql = "SELECT tip FROM Orders WHERE orderID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderID);
 
@@ -383,7 +383,7 @@ public class OrderDAO {
         String sql = "UPDATE Orders SET tip = ? WHERE orderID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDouble(1, tip);
             stmt.setInt(2, orderID);
             return stmt.executeUpdate() > 0;
@@ -397,7 +397,7 @@ public class OrderDAO {
         String sql = "DELETE FROM OrderItem WHERE orderItemID = ?";
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, orderItemID);
 
