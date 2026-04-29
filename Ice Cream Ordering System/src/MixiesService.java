@@ -236,6 +236,10 @@ public class MixiesService {
         return orderDAO.concludeOrder(orderID);
     }
 
+    public boolean cancelOrder(int orderID) {
+        return orderDAO.cancelOrder(orderID);
+    }
+
     /**
      * Calculates the total for an order and returns it.
      */

@@ -12,10 +12,11 @@ public class CartPanel extends JPanel {
 
     private final MixiesService service;
     private final KioskSession session;
+    private final KioskNavigator navigator;
 
     // Table model for cart items
     private final DefaultTableModel cartTableModel = new DefaultTableModel(
-            new Object[]{"OrderItem ID", "Flavor", "Quantity", "Cost", "Refund Status"}, 0) {
+            new Object[] { "OrderItem ID", "Flavor", "Quantity", "Cost", "Refund Status" }, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
@@ -31,6 +32,7 @@ public class CartPanel extends JPanel {
     public CartPanel(MixiesService service, KioskSession session, KioskNavigator navigator) {
         this.service = service;
         this.session = session;
+        this.navigator = navigator;
 
         setLayout(new BorderLayout());
 
@@ -44,6 +46,9 @@ public class CartPanel extends JPanel {
         // Button removes the selected item from the cart
         JButton removeButton = new JButton("Remove Item");
         removeButton.addActionListener(e -> removeSelectedItem());
+
+        JButton cancelButton = new JButton("Cancel Order");
+        cancelButton.addActionListener(e -> cancelOrder());
 
         // Button moves user to checkout screen
         JButton checkoutButton = new JButton("Checkout");
@@ -62,6 +67,7 @@ public class CartPanel extends JPanel {
         JPanel buttons = new JPanel();
         buttons.add(backButton);
         buttons.add(removeButton);
+        buttons.add(cancelButton);
         buttons.add(checkoutButton);
 
         bottomPanel.add(subtotalLabel, BorderLayout.WEST);
@@ -92,7 +98,7 @@ public class CartPanel extends JPanel {
             double itemCost = service.getDisplayedOrderItemCost(item);
             subtotal += itemCost;
 
-            cartTableModel.addRow(new Object[]{
+            cartTableModel.addRow(new Object[] {
                     item.getOrderItemID(),
                     item.getFlavor().getFlavorName(),
                     item.getQuantity(),
@@ -120,8 +126,7 @@ public class CartPanel extends JPanel {
                 this,
                 "Remove selected item from cart?",
                 "Confirm Remove",
-                JOptionPane.YES_NO_OPTION
-        );
+                JOptionPane.YES_NO_OPTION);
 
         if (confirm != JOptionPane.YES_OPTION) {
             return;
@@ -131,10 +136,38 @@ public class CartPanel extends JPanel {
 
         JOptionPane.showMessageDialog(
                 this,
-                removed ? "Item removed." : "Could not remove item."
-        );
+                removed ? "Item removed." : "Could not remove item.");
 
         refreshCart();
+    }
+
+    public void cancelOrder() {
+        int orderID = session.getCurrentOrderID();
+
+        if (orderID == -1) {
+            JOptionPane.showMessageDialog(this, "No active order.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Cancel the entire order? This cannot be undone.",
+                "Confirm Cancel",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        boolean cancelled = service.cancelOrder(orderID);
+
+        JOptionPane.showMessageDialog(
+                this,
+                cancelled ? "Order cancelled." : "Could not cancel order.");
+
+        refreshCart();
+        session.reset();
+        navigator.showWelcome();
     }
 
     // Automatically refresh cart whenever this panel becomes visible

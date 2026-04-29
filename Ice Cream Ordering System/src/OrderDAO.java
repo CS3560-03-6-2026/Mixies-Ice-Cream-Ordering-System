@@ -293,6 +293,21 @@ public class OrderDAO {
         }
     }
 
+    public boolean cancelOrder(int orderID) {
+        String sql = "UPDATE Orders SET orderStatus = 'Cancelled' WHERE orderID = ? AND orderStatus IN ('Ordering')";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, orderID);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     /**
      * Retrieves the order ID associated with a given order item.
      */

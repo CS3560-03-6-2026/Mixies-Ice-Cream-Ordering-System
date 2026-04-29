@@ -60,7 +60,7 @@ public class OrdersPanel extends JPanel {
             completeOrder(orderID);
         }, row -> {
             String status = (String) ordersTableModel.getValueAt(row, 2);
-            return !"Completed".equalsIgnoreCase(status);
+            return "Open".equalsIgnoreCase(status);
         }, 3);
 
         // Button actions
