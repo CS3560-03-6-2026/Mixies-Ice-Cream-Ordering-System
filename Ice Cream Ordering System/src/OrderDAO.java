@@ -1,6 +1,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 /**
  * OrderDAO handles all database operations related to orders,
@@ -60,7 +61,7 @@ public class OrderDAO {
                     return new Order(
                             rs.getInt("orderID"),
                             rs.getInt("employeeID"),
-                            rs.getString("orderDate"),
+                            rs.getObject("orderDate", LocalDateTime.class),
                             rs.getDouble("tip"),
                             rs.getDouble("total"),
                             rs.getString("orderStatus"));
@@ -210,6 +211,7 @@ public class OrderDAO {
 
     /**
      * Retrieves all order items for a given order, including their toppings.
+     * 
      * @param orderID
      * @return List of OrderItem objects with toppings populated
      */
@@ -443,7 +445,7 @@ public class OrderDAO {
                 orders.add(new Order(
                         rs.getInt("orderID"),
                         rs.getInt("employeeID"),
-                        rs.getString("orderDate"),
+                        rs.getObject("orderDate", LocalDateTime.class),
                         rs.getDouble("tip"),
                         rs.getDouble("total"),
                         rs.getString("orderStatus")));

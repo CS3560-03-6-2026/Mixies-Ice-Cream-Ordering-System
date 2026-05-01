@@ -1,3 +1,4 @@
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class Order {
     private final int employeeID;
 
     // Date the order was created
-    private final String orderDate;
+    private final LocalDateTime orderDate;
 
     // Tip amount added to the order
     private final double tip;
@@ -39,7 +40,7 @@ public class Order {
      * Constructor initializes all order details and
      * creates an empty list for order items.
      */
-    public Order(int orderID, int employeeID, String orderDate, double tip, double total, String orderStatus) {
+    public Order(int orderID, int employeeID, LocalDateTime orderDate, double tip, double total, String orderStatus) {
         this.orderID = orderID;
         this.employeeID = employeeID;
         this.orderDate = orderDate;
@@ -60,7 +61,7 @@ public class Order {
     }
 
     // Returns the order date
-    public String getOrderDate() {
+    public LocalDateTime getOrderDate() {
         return orderDate;
     }
 

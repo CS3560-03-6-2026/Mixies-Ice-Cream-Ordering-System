@@ -1,7 +1,9 @@
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.time.Duration;
 
 /**
  * OrdersPanel displays a list of all orders in the system.
@@ -21,10 +23,10 @@ public class OrdersPanel extends JPanel {
 
     // Table model for displaying orders (non-editable)
     private final DefaultTableModel ordersTableModel = new DefaultTableModel(
-        new Object[] { "Order ID", "Total", "Status", "Actions" }, 0) {
+            new Object[] { "Time Since", "Order ID", "Total", "Status", "Actions" }, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
-            return column == 3; // Only the button column is editable
+            return column == 4; // Only the button column is editable
         }
     };
 
@@ -56,13 +58,13 @@ public class OrdersPanel extends JPanel {
         ordersTable.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent mouseEvent) {
-                JTable table =(JTable) mouseEvent.getSource();
+                JTable table = (JTable) mouseEvent.getSource();
                 Point point = mouseEvent.getPoint();
                 int row = table.rowAtPoint(point);
                 if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1 && row != -1) {
                     int modelRow = table.convertRowIndexToModel(row);
 
-                    int orderID = (int) ordersTableModel.getValueAt(modelRow, 0);
+                    int orderID = (int) ordersTableModel.getValueAt(modelRow, 1);
                     viewSelectedOrder(orderID);
                 }
             }
@@ -73,12 +75,12 @@ public class OrdersPanel extends JPanel {
         add(new JScrollPane(ordersTable), BorderLayout.CENTER);
 
         completeButtonColumn = new ButtonColumn(ordersTable, row -> {
-            int orderID = (int) ordersTableModel.getValueAt(row, 0);
+            int orderID = (int) ordersTableModel.getValueAt(row, 1);
             completeOrder(orderID);
         }, row -> {
-            String status = (String) ordersTableModel.getValueAt(row, 2);
+            String status = (String) ordersTableModel.getValueAt(row, 3);
             return "Open".equalsIgnoreCase(status);
-        }, 3);
+        }, 4);
 
         // Button actions
         refreshButton.addActionListener(e -> refreshOrders());
@@ -102,12 +104,37 @@ public class OrdersPanel extends JPanel {
         // Populate table with order data, and buttons to complete order
         for (Order order : orders) {
             ordersTableModel.addRow(new Object[] {
+                    timeSince(order.getOrderDate()),
                     order.getOrderID(),
                     order.getTotal(),
                     order.getOrderStatus(),
                     "Complete",
             });
         }
+    }
+
+    public static String timeSince(LocalDateTime past) {
+        LocalDateTime now = LocalDateTime.now();
+
+        Duration duration = Duration.between(past, now);
+
+        if (duration.isNegative()) {
+            return "00:00";
+        }
+
+        long totalMinutes = duration.toMinutes();
+        long totalHours = totalMinutes / 60;
+
+        // If 24 hours or more, return in days
+        if (totalHours >= 24) {
+            long days = totalHours / 24;
+            return days + "d";
+        }
+
+        long hours = totalHours;
+        long minutes = totalMinutes % 60;
+
+        return String.format("%02d:%02d", hours, minutes);
     }
 
     /**
@@ -124,7 +151,7 @@ public class OrdersPanel extends JPanel {
         }
 
         // Get order ID from selected row
-        int orderID = (int) ordersTableModel.getValueAt(selectedRow, 0);
+        int orderID = (int) ordersTableModel.getValueAt(selectedRow, 1);
 
         // Open OrderDetailsDialog for the selected order
         new OrderDetailsDialog(
