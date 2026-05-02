@@ -1,7 +1,7 @@
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDateTime;
 
 /**
  * OrderDAO handles all database operations related to orders,
@@ -348,6 +348,13 @@ public class OrderDAO {
      */
     public boolean cancelOrder(int orderID) {
         return updateOrderStatus(orderID, "Cancelled", List.of("Ordering"));
+    }
+
+    /**
+     * Times out an order
+     */
+    public boolean timeoutOrder(int orderID) {
+        return updateOrderStatus(orderID, "Timeout", List.of("Ordering"));
     }
 
     /**

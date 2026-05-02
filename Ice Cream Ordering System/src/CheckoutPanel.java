@@ -14,6 +14,7 @@ public class CheckoutPanel extends JPanel {
     private final KioskSession session;
     private final KioskNavigator navigator;
     private final OrdersPanel ordersPanel;
+    private final OrderTimeoutManager timeoutManager;
 
     // Labels used to display the order totals
     private final JLabel subtotalLabel = new JLabel("Subtotal: $0.00");
@@ -24,11 +25,12 @@ public class CheckoutPanel extends JPanel {
     private double subtotal = 0.0;
 
     public CheckoutPanel(MixiesService service, KioskSession session,
-            KioskNavigator navigator, OrdersPanel ordersPanel) {
+            KioskNavigator navigator, OrdersPanel ordersPanel, OrderTimeoutManager timeoutManager) {
         this.service = service;
         this.session = session;
         this.navigator = navigator;
         this.ordersPanel = ordersPanel;
+        this.timeoutManager = timeoutManager;
 
         setLayout(new BorderLayout());
 
@@ -161,10 +163,10 @@ public class CheckoutPanel extends JPanel {
         if (checked_out) {
 
             JOptionPane.showMessageDialog(this, "Order confirmed! Total: $" + String.format("%.2f", total + tipAmount));
-            ordersPanel.refreshOrders();
             session.reset();
-
             navigator.showWelcome();
+            timeoutManager.onOrderEnded();
+            ordersPanel.refreshOrders();
 
         } else {
             JOptionPane.showMessageDialog(this, "Could not confirm order.");

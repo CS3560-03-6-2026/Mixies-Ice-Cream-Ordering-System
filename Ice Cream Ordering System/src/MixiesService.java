@@ -247,6 +247,10 @@ public class MixiesService {
         return orderDAO.cancelOrder(orderID);
     }
 
+    public boolean timeoutOrder(int orderID) {
+        return orderDAO.timeoutOrder(orderID);
+    }
+
     /**
      * Calculates the total for an order and returns it.
      */

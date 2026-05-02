@@ -1,9 +1,9 @@
 import java.awt.*;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.time.Duration;
 
 /**
  * OrdersPanel displays a list of all orders in the system.

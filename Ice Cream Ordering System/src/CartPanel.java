@@ -3,16 +3,17 @@
  * It displays the cart total and provides buttons to go back or checkout.
  */
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class CartPanel extends JPanel {
 
     private final MixiesService service;
     private final KioskSession session;
     private final KioskNavigator navigator;
+    private final OrderTimeoutManager timeoutManager;
 
     // Table model for cart items
     private final DefaultTableModel cartTableModel = new DefaultTableModel(
@@ -29,10 +30,11 @@ public class CartPanel extends JPanel {
     // Label showing subtotal for current cart
     private final JLabel subtotalLabel = new JLabel("Subtotal: $0.00");
 
-    public CartPanel(MixiesService service, KioskSession session, KioskNavigator navigator) {
+    public CartPanel(MixiesService service, KioskSession session, KioskNavigator navigator, OrderTimeoutManager timeoutManager) {
         this.service = service;
         this.session = session;
         this.navigator = navigator;
+        this.timeoutManager = timeoutManager;
 
         setLayout(new BorderLayout());
 
@@ -164,16 +166,19 @@ public class CartPanel extends JPanel {
         JOptionPane.showMessageDialog(
                 this,
                 cancelled ? "Order cancelled." : "Could not cancel order.");
-
+        
         refreshCart();
         session.reset();
         navigator.showWelcome();
+        timeoutManager.onOrderEnded();
     }
 
     // Automatically refresh cart whenever this panel becomes visible
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
+
+        timeoutManager.onOrderActivity();
 
         if (visible) {
             refreshCart();

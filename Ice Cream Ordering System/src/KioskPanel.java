@@ -20,6 +20,8 @@ public class KioskPanel extends JPanel {
     private final KioskSession session;
     private final KioskNavigator navigator;
 
+    private final OrderTimeoutManager timeoutManager;
+
     public KioskPanel(MixiesService service, Employee employee, OrdersPanel ordersPanel) {
         this.service = service;
         this.employee = employee;
@@ -29,11 +31,17 @@ public class KioskPanel extends JPanel {
         session = new KioskSession();
         navigator = new KioskNavigator(cardLayout, cardPanel);
 
+        timeoutManager = new OrderTimeoutManager(() -> {
+            service.timeoutOrder(session.getCurrentOrderID());
+            session.reset();
+            navigator.showWelcome();
+        });
+
         cardPanel.add(buildWelcomeScreen(), "welcome");
         cardPanel.add(new IceCreamMenuPanel(service, session, navigator), "menu");
         cardPanel.add(new IceCreamCustomizationPanel(service, session, navigator), "customize");
-        cardPanel.add(new CartPanel(service, session, navigator), "cart");
-        cardPanel.add(new CheckoutPanel(service, session, navigator, ordersPanel), "checkout");
+        cardPanel.add(new CartPanel(service, session, navigator, timeoutManager), "cart");
+        cardPanel.add(new CheckoutPanel(service, session, navigator, ordersPanel, timeoutManager), "checkout");
 
         add(cardPanel, BorderLayout.CENTER);
 
@@ -65,6 +73,8 @@ public class KioskPanel extends JPanel {
 
             navigator.showMenu();
         });
+
+        startButton.addActionListener(e -> timeoutManager.onOrderStarted());
 
         JPanel center = new JPanel();
         center.add(startButton);
