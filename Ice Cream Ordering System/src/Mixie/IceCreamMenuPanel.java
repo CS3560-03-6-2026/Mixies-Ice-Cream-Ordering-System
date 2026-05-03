@@ -117,7 +117,7 @@ public class IceCreamMenuPanel extends JPanel {
         JLabel imageLabel = new JLabel();
         try {
             // Build image file path based on flavor name
-            String path = "src/images/" + flavor.getFlavorName()
+            String path = "Ice Cream Ordering System/src/images/" + flavor.getFlavorName()
                 .toLowerCase()
                 .replaceAll(" ", "") + ".png";
             
