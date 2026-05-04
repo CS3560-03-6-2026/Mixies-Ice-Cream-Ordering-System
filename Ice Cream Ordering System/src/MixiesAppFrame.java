@@ -109,11 +109,7 @@ public class MixiesAppFrame extends JFrame {
     }
 
     private void openEmployeeAccess(Employee employee) {
-        //Show employee orders and orders panels
-        if (tabs.indexOfTab("Employee Orders") == -1) {
-            tabs.addTab("Employee Orders", new EmployeeOrderPanel(service, employee));
-        }
-
+        //Show orders panel
         if (tabs.indexOfTab("Orders") == -1) {
             tabs.addTab("Orders", new OrdersPanel(service));
         }
@@ -142,10 +138,6 @@ public class MixiesAppFrame extends JFrame {
 
     private void employeeSignOut() {
         // Remove employee-specific tabs
-        int employeeOrdersTabIndex = tabs.indexOfTab("Employee Orders");
-        if (employeeOrdersTabIndex != -1) {
-            tabs.removeTabAt(employeeOrdersTabIndex);
-        }
 
         int ordersTabIndex = tabs.indexOfTab("Orders");
         if (ordersTabIndex != -1) {
