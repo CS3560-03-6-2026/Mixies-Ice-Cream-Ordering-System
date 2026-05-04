@@ -1,4 +1,5 @@
 package Mixie;
+
 import java.awt.*;
 import javax.swing.*;
 
@@ -6,7 +7,8 @@ import Mixie.Employee.Employee;
 import Mixie.Employee.employeeRoles;
 
 /**
- * MixiesAppFrame is the main application window for the Mixies Ice Cream System.
+ * MixiesAppFrame is the main application window for the Mixies Ice Cream
+ * System.
  * 
  * It manages:
  * - Navigation between different panels using tabs
@@ -29,7 +31,7 @@ public class MixiesAppFrame extends JFrame {
 
     private final OrdersPanel ordersPanel;
 
-    //Employee access
+    // Employee access
     JButton employeeAccessButton;
 
     JLabel loggedInLabel;
@@ -38,10 +40,18 @@ public class MixiesAppFrame extends JFrame {
      * Constructor initializes the main application frame and UI components.
      */
     public MixiesAppFrame(Employee loggedInEmployee) {
+
+        try {
+            // Set the Mint Look and Feel
+            UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         this.service = new MixiesService();
         this.tabs = new JTabbedPane();
         this.ordersPanel = new OrdersPanel(service);
-        
+
         tabs.addTab("Kiosk Menu", new KioskPanel(service, loggedInEmployee, ordersPanel));
 
         // Frame settings
@@ -50,7 +60,7 @@ public class MixiesAppFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-    
+
         // Button to access manager panel
         this.employeeAccessButton = new JButton("Employee Access");
         employeeAccessButton.addActionListener(e -> employeeIDPrompt());
@@ -92,16 +102,15 @@ public class MixiesAppFrame extends JFrame {
             employeeAccessButton.setText("Sign Out (" + employee.getEmployeeName() + ")");
             employeeAccessButton.removeActionListener(employeeAccessButton.getActionListeners()[0]);
             employeeAccessButton.addActionListener(e -> employeeSignOut());
-            
-            //Changed logged in label to show employee name and role
+
+            // Changed logged in label to show employee name and role
             loggedInLabel.setText(
-                "Logged in: " + employee.getEmployeeName() +
-                " (" + employee.getEmployeeRole() + ")"
-            );
+                    "Logged in: " + employee.getEmployeeName() +
+                            " (" + employee.getEmployeeRole() + ")");
 
             // Open employee access panel
             openEmployeeAccess(employee);
-            
+
             // If employee is a manager, also open manager access
             if (employee.getEmployeeRole() == employeeRoles.MANAGER) {
                 openManagerAccess(employee);
@@ -113,7 +122,7 @@ public class MixiesAppFrame extends JFrame {
     }
 
     private void openEmployeeAccess(Employee employee) {
-        //Show employee orders and orders panels
+        // Show employee orders and orders panels
         if (tabs.indexOfTab("Employee Orders") == -1) {
             tabs.addTab("Employee Orders", new EmployeeOrderPanel(service, employee));
         }
@@ -122,7 +131,6 @@ public class MixiesAppFrame extends JFrame {
             tabs.addTab("Orders", new OrdersPanel(service));
         }
     }
-
 
     /**
      * Handles manager access by prompting for an employee ID

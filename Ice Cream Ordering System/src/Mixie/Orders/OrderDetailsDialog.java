@@ -1,4 +1,5 @@
 package Mixie.Orders;
+
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
@@ -55,6 +56,12 @@ public class OrderDetailsDialog extends JDialog {
         // Buttons for refreshing data and refunding items
         JButton refundButton = new JButton("Refund Selected Item");
         JButton refreshButton = new JButton("Refresh");
+
+        // Table column widths
+        itemsTable.getColumnModel().getColumn(0).setMaxWidth(150); // OrderItem ID
+        itemsTable.getColumnModel().getColumn(1).setMinWidth(150); // Flavor
+        itemsTable.getColumnModel().getColumn(2).setMaxWidth(120); // Scoops
+        itemsTable.getColumnModel().getColumn(3).setMinWidth(200); // Modifiers
 
         // Top panel for action buttons
         JPanel top = new JPanel();

@@ -1,4 +1,5 @@
 package Mixie;
+
 import java.awt.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -48,6 +49,11 @@ public class OrdersPanel extends JPanel {
 
         // Set layout for the panel
         setLayout(new BorderLayout());
+
+        // Table column widths
+        ordersTable.getColumnModel().getColumn(0).setMaxWidth(100); // Time Since
+        ordersTable.getColumnModel().getColumn(1).setMaxWidth(80); // Order ID
+        ordersTable.getColumnModel().getColumn(2).setMaxWidth(200); // Total
 
         // Buttons for refreshing and viewing order details
         JButton refreshButton = new JButton("Refresh Orders");
@@ -111,11 +117,15 @@ public class OrdersPanel extends JPanel {
             ordersTableModel.addRow(new Object[] {
                     timeSince(order.getOrderDate()),
                     order.getOrderID(),
-                    order.getTotal(),
+                    formatOrderTotal(order.getTotal()),
                     order.getOrderStatus(),
                     "Complete",
             });
         }
+    }
+
+    public String formatOrderTotal(double total) {
+        return String.format("$%.2f", total);
     }
 
     public static String timeSince(LocalDateTime past) {
