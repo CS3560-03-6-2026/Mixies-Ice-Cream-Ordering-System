@@ -27,7 +27,7 @@ public class EmployeeDAO {
                     return new Employee(
                             rs.getInt("employeeID"),
                             rs.getString("employeeName"),
-                            employeeRoles.valueOf(rs.getString("employeeRole").toUpperCase())
+                            EmployeeRoles.valueOf(rs.getString("employeeRole").toUpperCase())
                     );
                 }
             }

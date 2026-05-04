@@ -15,7 +15,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
 
             // Create a sample logged-in employee (hardcoded for now)
-            Employee loggedIn = new Employee(1, "Ava", employeeRoles.MANAGER);
+            Employee loggedIn = new Employee(1, "Ava", EmployeeRoles.MANAGER);
 
             // Create and display the main application frame
             new MixiesAppFrame(loggedIn).setVisible(true);

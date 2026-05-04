@@ -99,7 +99,7 @@ public class MixiesAppFrame extends JFrame {
             openEmployeeAccess(employee);
             
             // If employee is a manager, also open manager access
-            if (employee.getEmployeeRole() == employeeRoles.MANAGER) {
+            if (employee.getEmployeeRole() == EmployeeRoles.MANAGER) {
                 openManagerAccess(employee);
             }
 

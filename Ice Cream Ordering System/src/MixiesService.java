@@ -30,7 +30,7 @@ public class MixiesService {
      */
     public boolean canAccessManagerScreen(int employeeID) {
         Employee employee = employeeDAO.getEmployeeById(employeeID);
-        return employee != null && employee.getEmployeeRole() == employeeRoles.MANAGER;
+        return employee != null && employee.getEmployeeRole() == EmployeeRoles.MANAGER;
     }
 
     /**
@@ -282,7 +282,7 @@ public class MixiesService {
      */
     private boolean isManager(Employee employee) {
         return employee != null &&
-                (employee.getEmployeeRole() == employeeRoles.MANAGER);
+                (employee.getEmployeeRole() == EmployeeRoles.MANAGER);
     }
 
     public boolean removeOrderItem(int orderItemID, int orderID) {

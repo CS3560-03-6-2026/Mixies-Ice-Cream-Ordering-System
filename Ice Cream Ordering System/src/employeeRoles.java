@@ -1,4 +1,4 @@
-public enum employeeRoles {
+public enum EmployeeRoles {
     WORKER,
     MANAGER
 }

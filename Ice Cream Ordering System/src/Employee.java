@@ -3,9 +3,9 @@
 public class Employee {
     private final int employeeID; // Key identifier
     private final String employeeName;
-    private final employeeRoles employeeRole;
+    private final EmployeeRoles employeeRole;
 
-    public Employee(int employeeID, String employeeName, employeeRoles employeeRole) {
+    public Employee(int employeeID, String employeeName, EmployeeRoles employeeRole) {
         this.employeeID = employeeID;
         this.employeeName = employeeName;
         this.employeeRole = employeeRole;
@@ -20,7 +20,7 @@ public class Employee {
         return employeeName;
     }
 
-    public employeeRoles getEmployeeRole() {
+    public EmployeeRoles getEmployeeRole() {
         return employeeRole;
     }
 
