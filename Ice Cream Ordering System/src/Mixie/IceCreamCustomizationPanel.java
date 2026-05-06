@@ -138,7 +138,7 @@ public class IceCreamCustomizationPanel extends JPanel {
         // Load topping image using topping name (lowercase, no spaces) + "-topping.png"
         JLabel imageLabel = new JLabel();
         try {
-            String path = "src/images/" + topping.getToppingName()
+            String path = "Ice Cream Ordering System/src/images/" + topping.getToppingName()
                     .toLowerCase()
                     .replaceAll(" ", "") + "-topping.png";
 
